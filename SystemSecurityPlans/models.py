@@ -1,8 +1,6 @@
 from django.db import models
-from django.utils.timezone import now
 
 # Define some common field types
-
 
 class customMany2ManyField(models.ManyToManyField):
     def __init__(self, *args, **kwargs):
@@ -10,53 +8,9 @@ class customMany2ManyField(models.ManyToManyField):
         super().__init__(*args, **kwargs)
 
 
-class customTextField(models.CharField):
-    def __init__(self,len, *args, **kwargs):
-        if len == 'short':
-            kwargs['max_length'] = 25
-        elif len == 'medium':
-            kwargs['max_length'] = 100
-        elif len == 'long':
-            kwargs['max_length'] = 1000
-            kwargs['blank'] = True
-        super().__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        kwargs["len"] = len
-        return name, path, args, kwargs
-
-class shortText(models.CharField):
-    description = "A short (25 characters) text field that does not allow blanks"
-
+class customTextField(models.TextField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 25
-        super().__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs["max_length"]
-        return name, path, args, kwargs
-
-
-class mediumText(models.CharField):
-    description = "A 100 character text field that does not allow blanks"
-
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 100
-        super().__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs["max_length"]
-        return name, path, args, kwargs
-
-
-class longText(models.CharField):
-    description = "A 1000 character text field that does allow blanks"
-
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 100
+        kwargs['max_length'] = 2000
         kwargs['blank'] = True
         super().__init__(*args, **kwargs)
 
@@ -66,73 +20,131 @@ class longText(models.CharField):
         del kwargs['blank']
         return name, path, args, kwargs
 
+class status(models.Model):
+    state = models.CharField(max_length=30)
+    description = models.CharField(max_length=80)
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.state
+
+
 class properties(models.Model):
-    value = customTextField(len='medium')
-    name = customTextField(len='medium')
-    propertyID = customTextField(len='short')
-    ns = customTextField(len='medium')
-    prop_class = customTextField(len='medium')
+    value = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=100)
+    propertyID = models.CharField(max_length=25, blank=True)
+    ns = models.CharField(max_length=25, blank=True)
+    prop_class = models.CharField(max_length=25, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class links(models.Model):
-    text = customTextField(len='medium')
-    href = customTextField(len='medium')
-    rel = customTextField(len='medium')
-    mediaType = customTextField(len='medium')
+    text = models.CharField(max_length=100)
+    href = models.CharField(max_length=100)
+    rel = models.CharField(max_length=100, blank=True)
+    mediaType = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return self.text
 
 
 class documents(models.Model):
-    identifier = customTextField(len='short')
-    type = customTextField(len='medium')
+    identifier = models.CharField(max_length=25)
+    type = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.identifier
 
 
 class annotations(models.Model):
-    name = customTextField(len='medium')
-    annotationID = customTextField(len='short')
-    ns = customTextField(len='medium')
-    value = customTextField(len='long')
-    remarks = customTextField(len='long')
+    name = models.CharField(max_length=100)
+    annotationID = models.CharField(max_length=25)
+    ns = models.CharField(max_length=100)
+    value = customTextField()
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.name
+
+
+class systemFunctions(models.Model):
+    title = models.CharField(max_length=100)
+    description = customTextField()
+
+    def __str__(self):
+        return self.title
+
+
+class authorizedPrivileges(models.Model):
+    title = models.CharField(max_length=100)
+    description = customTextField()
+    functionsPerformed = customMany2ManyField(systemFunctions)
+
+    def __str__(self):
+        return self.title
 
 
 class roles(models.Model):
-    roleID = customTextField(len='short')
-    title = customTextField(len='short')
-    shortName = customTextField(len='short')
-    desc = customTextField(len='short')
+    title = models.CharField(max_length=100)
+    shortName = models.CharField(max_length=25)
+    desc = models.CharField(max_length=100)
+    authorizedPrivileges = customMany2ManyField(authorizedPrivileges)
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.title
 
 
 class addrLine(models.Model):
-    value = customTextField(len='medium')
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.value
 
 
 class address(models.Model):
-    type = customTextField(len='medium')
+    title = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
     postalAddress = customMany2ManyField(addrLine)
-    city = customTextField(len='medium')
+    city = models.CharField(max_length=100)
     state = models.CharField(max_length=2)
-    postalCode = customTextField(len='short')
-    country = customTextField(len='medium')
+    postalCode = models.CharField(max_length=25)
+    country = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
 
 
 class emailAddresses(models.Model):
-    email = models.CharField(max_length=50)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.email
 
 
 class telephoneNumbers(models.Model):
-    number = customTextField(len='short')
-    type = customTextField(len='short')
+    number = models.CharField(max_length=25)
+    type = models.CharField(max_length=25)
+
+    def __str__(self):
+        r = self.type + ': ' + self.number
+        return r
 
 
 class URLs(models.Model):
-    uri = customTextField(len='medium')
+    uri = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.uri
 
 
 class locations(models.Model):
-    locationID = customTextField(len='short')
+    locationID = models.CharField(verbose_name='location description', max_length=25)
     addresses = models.ForeignKey(address, on_delete=models.PROTECT)
     emailAddresses = customMany2ManyField(emailAddresses)
     telephoneNumbers = customMany2ManyField(telephoneNumbers)
@@ -140,12 +152,15 @@ class locations(models.Model):
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.locationID
 
 
 class orgs(models.Model):
-    orgName = customTextField(len='medium')
-    shortName = models.CharField(max_length=15)
+    orgName = models.CharField(max_length=100)
+    shortName = models.CharField(max_length=25)
     addresses = customMany2ManyField(address)
     emailAddresses = customMany2ManyField(emailAddresses)
     telephoneNumbers = customMany2ManyField(telephoneNumbers)
@@ -153,12 +168,15 @@ class orgs(models.Model):
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.orgName
 
 
 class persons(models.Model):
-    personName = customTextField(len='medium')
-    shortName = models.CharField(max_length=15)
+    personName = models.CharField(max_length=100)
+    shortName = models.CharField(max_length=25)
     orgs = customMany2ManyField(orgs)
     addresses = customMany2ManyField(address)
     emailAddresses = customMany2ManyField(emailAddresses)
@@ -167,30 +185,43 @@ class persons(models.Model):
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.personName
 
 
 class parties(models.Model):
-    partyID = customTextField(len='short')
+    partyID = models.CharField(verbose_name='Party Description', max_length=100)
     persons = customMany2ManyField(persons)
+    orgs = customMany2ManyField(orgs)
+
+    def __str__(self):
+        return self.partyID
 
 
 class informationTypeImpacts(models.Model):
-    impactType = models.CharField(max_length=15)  # Confidentiality, Integrity or availability
+    impactType = models.CharField(max_length=25)  # Confidentiality, Integrity or availability
     properties = customMany2ManyField(properties)
-    base = models.CharField(max_length=15)  # High, Medium, or Low
-    selected = models.CharField(max_length=15)  # High, Medium, or Low
-    adjustmentJustification = customTextField(len='long')
+    base = models.CharField(max_length=25)  # High, Medium, or Low
+    selected = models.CharField(max_length=25)  # High, Medium, or Low
+    adjustmentJustification = customTextField()
+
+    def __str__(self):
+        return self.impactType
 
 
 class informationTypes(models.Model):
-    InfoTypeID = customTextField(len='short')
-    title = customTextField(len='medium')
-    description = customTextField(len='long')
+    InfoTypeID = models.CharField(max_length=25)
+    title = models.CharField(max_length=100)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     confidentialityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
     integrityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
     availabilityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.title
 
 
 class systemInformationTypes(models.Model):
@@ -199,70 +230,76 @@ class systemInformationTypes(models.Model):
     links = customMany2ManyField(links)
     informationTypes = models.ForeignKey(informationTypes, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.informationTypes
+
 
 class attachments(models.Model):
     value = models.BinaryField()
-    filename = customTextField(len='medium')
-    mediaType = customTextField(len='medium')
+    filename = models.CharField(max_length=100)
+    mediaType = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.filename
 
 
 class images(models.Model):
-    description = customTextField(len='long')
+    description = customTextField()
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     image = models.ForeignKey(attachments, on_delete=models.PROTECT)
     caption = models.CharField(max_length=200)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.image.filename
 
 
 class diagrams(models.Model):
-    type = customTextField(len='short')  # authorizationBoundary, networkArchitecture, dataFlow
-    description = customTextField(len='long')
+    type = models.CharField(max_length=100)  # authorizationBoundary, networkArchitecture, dataFlow
+    description = customTextField()
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
     diagrams = customMany2ManyField(images)
+
+    def __str__(self):
+        return self.type
 
 
 class systemCharacteristics(models.Model):
-    systemName = customTextField(len='medium')
-    systemNameShort = customTextField(len='short')
-    description = customTextField(len='long')
+    systemName = models.CharField(max_length=100)
+    systemNameShort = models.CharField(max_length=25)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     dateAuthorized = models.DateTimeField()
-    securitySensitivityLevel = customTextField(len='short')
-    status = customTextField(len='short')
-    remarks = customTextField(len='long')
+    securitySensitivityLevel = models.CharField(max_length=25)
+    status = customMany2ManyField(status)
+    remarks = customTextField()
     leveragedAuthorizations = models.CharField(max_length=200, blank=True)
     authorizationBoundary = customMany2ManyField(diagrams, related_name='+')
     networkArchitecture = customMany2ManyField(diagrams, related_name='+')
     dataFlow = customMany2ManyField(diagrams, related_name='+')
 
-
-class systemFunctions(models.Model):
-    title = customTextField(len='medium')
-    description = customTextField(len='long')
-
-
-class authorizedPrivileges(models.Model):
-    title = customTextField(len='medium')
-    description = customTextField(len='long')
-    functionsPerformed = customMany2ManyField(systemFunctions)
+    def __str__(self):
+        return self.systemName
 
 
 class users(models.Model):
-    title = customTextField(len='medium')
-    shortName = customTextField(len='short')
-    description = customTextField(len='medium')
+    title = models.CharField(max_length=100)
+    shortName = models.CharField(max_length=25)
+    description = models.CharField(max_length=100)
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    roleIDs = customMany2ManyField(roles)
-    authorizedPrivileges = customMany2ManyField(authorizedPrivileges)
+    roles = customMany2ManyField(roles)
+
+    def __str__(self):
+        return self.title
 
 
 class systemImplementation(models.Model):
@@ -270,19 +307,22 @@ class systemImplementation(models.Model):
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     user = customMany2ManyField(users)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
 
 
 class systemComponents(models.Model):
-    componentType = customTextField(len='medium')
-    title = customTextField(len='medium')
-    description = customTextField(len='medium')
+    componentType = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
-    status = customTextField(len='short')
+    status = customMany2ManyField(status)
     responsibleRoles = customMany2ManyField(roles)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.title
 
 
 class portRanges(models.Model):
@@ -290,62 +330,81 @@ class portRanges(models.Model):
     end = models.IntegerField()
     transport = models.CharField(max_length=40)
 
+    def __str__(self):
+        r = str(self.start) + '-' + str(self.end) + ' ' + self.transport
+        return r
+
 
 class sspProtocols(models.Model):
-    protocalID = customTextField(len='short')
-    name = customTextField(len='medium')
-    title = customTextField(len='medium')
+    protocalID = models.CharField(max_length=25)
+    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     portRanges = customMany2ManyField(portRanges)
+
+    def __str__(self):
+        return self.name
 
 
 class systemServices(models.Model):
-    serviceID = customTextField(len='medium')
-    title = customTextField(len='medium')
-    description = customTextField(len='medium')
+    serviceID = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     sspProtocol = customMany2ManyField(sspProtocols)
-    purpose = customTextField(len='long')
-    remarks = customTextField(len='long')
+    purpose = customTextField()
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.title
 
 
 class sspInterconnection(models.Model):
-    InterconnectID = customTextField(len='short')
-    remoteSystemName = customTextField(len='medium')
+    InterconnectID = models.CharField(max_length=25)
+    remoteSystemName = models.CharField(max_length=100)
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     responsibleRoles = customMany2ManyField(roles)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.remoteSystemName
 
 
 class inventoryComponents(models.Model):
-    use = customTextField(len='long')
+    use = customTextField()
     systemComponent = customMany2ManyField(systemComponents)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
 
 
 class inventoryItems(models.Model):
-    itemID = models.CharField(max_length=15)
-    assetID = models.CharField(max_length=15)
-    description = customTextField(len='long')
+    itemID = models.CharField(max_length=100)
+    assetID = models.CharField(max_length=100)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
     responsibleRoles = customMany2ManyField(roles)
     inventoryComponents = customMany2ManyField(inventoryComponents)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.itemID
 
 
 class systemInventory(models.Model):
     inventoryItems = customMany2ManyField(inventoryItems)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
 
 
 class systemParameters(models.Model):
-    paramID = customTextField(len='short')
-    value = customTextField(len='long')
+    paramID = models.CharField(max_length=25)
+    value = customTextField()
+
+    def __str__(self):
+        return self.paramID
 
 
 class implementationComponents(models.Model):
@@ -354,19 +413,22 @@ class implementationComponents(models.Model):
 
 
 class statements(models.Model):
-    statementID = models.CharField(max_length=15)
-    description = customTextField(len='long')
+    statementID = models.CharField(max_length=25)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     links = customMany2ManyField(links)
     responsibleRoles = customMany2ManyField(roles)
     implementationComponents = customMany2ManyField(implementationComponents)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
+
+    def __str__(self):
+        return self.statementID
 
 
 class implementedRequirements(models.Model):
-    requirementID = customTextField(len='short')
-    controlID = customTextField(len='short')
-    description = customTextField(len='long')
+    requirementID = models.CharField(max_length=25)
+    controlID = models.CharField(max_length=25)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     annotations = customMany2ManyField(annotations)
     links = customMany2ManyField(links)
@@ -374,73 +436,58 @@ class implementedRequirements(models.Model):
     responsibleRoles = customMany2ManyField(roles)
     systemParameters = customMany2ManyField(systemParameters)
     statements = customMany2ManyField(statements)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
 
-
-class controlImplementation(models.Model):
-    description = customTextField(len='long')
-    implementedRequirements = customMany2ManyField(implementedRequirements)
+    def __str__(self):
+        return self.controlID + ' - ' + self.requirementID
 
 
 class citations(models.Model):
-    text = customTextField(len='long')
+    text = customTextField()
     properties = customMany2ManyField(properties)
-    biblio = customTextField(len='long')
+    biblio = customTextField()
+
+    def __str__(self):
+        return self.text
 
 
 class hashes(models.Model):
-    value = customTextField(len='long')
-    algorithm = customTextField(len='medium')
+    value = customTextField()
+    algorithm = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.algorithm
 
 
 class rlinks(models.Model):
     link = models.ForeignKey(links, on_delete=models.PROTECT)
     hash = models.ForeignKey(hashes, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.link
+
 
 class resources(models.Model):
-    resourceID = customTextField(len='short')
-    title = customTextField(len='medium')
-    description = customTextField(len='long')
+    resourceID = models.CharField(max_length=25)
+    title = models.CharField(max_length=100)
+    description = customTextField()
     properties = customMany2ManyField(properties)
     documents = customMany2ManyField(documents)
     citations = customMany2ManyField(citations)
     rlinks = customMany2ManyField(rlinks)
     attachments = customMany2ManyField(attachments)
-    remarks = customTextField(len='long')
+    remarks = customTextField()
 
-
-class backMatter(models.Model):
-    resources = customMany2ManyField(resources)
-
-
-# class systemSecurityPlanHistory(models.Model):
-#     sspID = customTextField(len='short')
-#     title = customTextField(len='medium')
-#     published = models.DateTimeField()
-#     lastModified = models.DateTimeField()
-#     version = customTextField(len='short')
-#     oscalVersion = customTextField(len='short')
-#     properties = customMany2ManyField(properties)
-#     documentID = customMany2ManyField(documents)
-#     links = customMany2ManyField(links)
-#     sspRoles = customMany2ManyField(roles)
-#     locations = customMany2ManyField(locations)
-#     parties = customMany2ManyField(parties)
-#     responsibleParty = customMany2ManyField(roles, related_name='+')
-#     remarks = customTextField(len='long')
-#     systemCharacteristics = models.ForeignKey(systemCharacteristics, on_delete=models.PROTECT)
-#     systemImplementation = models.ForeignKey(systemImplementation, on_delete=models.PROTECT)
-#     controlImplementation = models.ForeignKey(controlImplementation, on_delete=models.PROTECT)
-#     backMatter = models.ForeignKey(backMatter, on_delete=models.PROTECT)
+    def __str__(self):
+        return self.title
 
 
 class systemSecurityPlan(models.Model):
-    sspID = customTextField(len='short')
-    title = customTextField(len='medium')
-    published = models.DateTimeField(default=now())
-    lastModified = models.DateTimeField(default=now())
-    version = customTextField(len='short')
+    sspID = models.CharField(max_length=25)
+    title = models.CharField(max_length=100)
+    published = models.DateTimeField()
+    lastModified = models.DateTimeField()
+    version = models.CharField(max_length=25)
     oscalVersion = models.CharField(max_length=10, default='1.0.0')
     # revisionHistory = models.ForeignKey(systemSecurityPlanHistory, on_delete=models.PROTECT)
     documentID = customMany2ManyField(documents, blank=True)
@@ -450,8 +497,12 @@ class systemSecurityPlan(models.Model):
     locations = customMany2ManyField(locations)
     parties = customMany2ManyField(parties)
     responsibleParty = customMany2ManyField(roles, related_name='+')
-    remarks = customTextField(len='long')
+    remarks = customTextField()
     systemCharacteristics = models.ForeignKey(systemCharacteristics, on_delete=models.PROTECT, null=True)
-    systemImplementation = models.ForeignKey(systemImplementation, on_delete=models.PROTECT, null=True)
-    controlImplementation = models.ForeignKey(controlImplementation, on_delete=models.PROTECT, null=True)
-    backMatter = models.ForeignKey(backMatter, on_delete=models.PROTECT, null=True)
+    # systemImplementations = models.ForeignKey(systemImplementation, on_delete=models.PROTECT, null=True)
+    systemComponents = customMany2ManyField(systemComponents)
+    controlImplementations = customMany2ManyField(implementedRequirements)
+    backMatter = customMany2ManyField(resources)
+
+    def __str__(self):
+        return self.title
