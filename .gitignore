@@ -1,2 +1,17 @@
 # Project exclude paths
 /venv/
+/.idea/.gitignore
+/SystemSecurityPlans/migrations/0001_initial.py
+/SystemSecurityPlans/migrations/0002_auto_20200528_1557.py
+/SystemSecurityPlans/migrations/0003_auto_20200528_2122.py
+/OSCALimport/migrations/__init__.py
+/OSCALimport/__init__.py
+/SystemSecurityPlans/migrations/__init__.py
+/db.sqlite3
+/importSecurityControlsFromWord.log
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/OSCALweb.iml
+/.idea/dictionaries/parallels.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
