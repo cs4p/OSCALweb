@@ -1,0 +1,98 @@
+[
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 1,
+    "fields": {
+      "title": "Add or remove hardware",
+      "description": "Add or remove hardware from physical systems either before deployment or within the data center."
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 2,
+    "fields": {
+      "title": "Install and Configure Software",
+      "description": "Install and configure software which requires root or administrator privileges"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 3,
+    "fields": {
+      "title": "Deploy updates",
+      "description": "Install OS updates, patches and hot fixes which require root or administer access"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 4,
+    "fields": {
+      "title": "Backups",
+      "description": "perform backups of VMs and Databases"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 5,
+    "fields": {
+      "title": "Add or remove database users",
+      "description": "Add, remove, and administrator database accounts and roles"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 6,
+    "fields": {
+      "title": "CRUD operations",
+      "description": "Perform Create, Read, Update, and Delete operations on database"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 7,
+    "fields": {
+      "title": "Database Backups",
+      "description": "perform backups of database and administer database replication"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 8,
+    "fields": {
+      "title": "Debug Applications",
+      "description": "Connect to production servers and review logs system information or other files"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 9,
+    "fields": {
+      "title": "Run commands as service account",
+      "description": "Use of SUDO to deploy new software and restart applications"
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 10,
+    "fields": {
+      "title": "Manage security applications",
+      "description": ""
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 11,
+    "fields": {
+      "title": "manage firewall policies",
+      "description": ""
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.systemfunctions",
+    "pk": 12,
+    "fields": {
+      "title": "Security assessments",
+      "description": "perform security assessments of new or existing applications and servers"
+    }
+  }
+]

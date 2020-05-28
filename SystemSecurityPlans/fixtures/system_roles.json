@@ -1,0 +1,61 @@
+[{
+"model": "SystemSecurityPlans.roles", "pk": 1, "fields": {"title": "System Administrator", "shortName": "Sys Admin",
+"desc": "Full administrative access (root, Administrator) on physical and virtual servers",
+"remarks": "Full administrative access (root, Administrator) on physical and virtual servers\tAdd/remove users and hardware, install  and configure software, OS updates, patches and hotfixes, perform backups",
+"authorizedPrivileges": [1, 2], "properties": [1, 3, 8],
+"annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 2,
+"fields": {"title": "Virtual Machine Administrator", "shortName": "VM Admin",
+"desc": "Full administrative access (root, Administrator) on virtual servers",
+"remarks": "Full administrative access (root, Administrator) on virtual servers\tAdd/remove users, install  and configure software, OS updates, patches and hotfixes, perform backups",
+"authorizedPrivileges": [2], "properties": [1, 3, 8], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 3,
+"fields": {"title": "Database Administrator", "shortName": "DB Admin", "desc": "Full control of RDBMS instance",
+"remarks": "Full control of RDBMS instance\t\r\nAdd/remove users, CRUD operations, perform backups, administer database replication",
+"authorizedPrivileges": [3], "properties": [1, 3, 8], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 4,
+"fields": {"title": "Developer", "shortName": "Dev", "desc": "Responsible for creating code",
+"remarks": "Read only access to production application servers; SUDO permissions to deploy new software and restart applications\tResponsible for creating code to support MAX applications. Deploying changes in compliance with MAX.gov Change Management Process.",
+"authorizedPrivileges": [4, 5], "properties": [1, 3, 7], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 5,
+"fields": {"title": "Program Managers", "shortName": "PM", "desc": "Reviews, approves and enforces policy",
+"remarks": "", "authorizedPrivileges": [], "properties": [2, 3, 6], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 6, "fields": {"title": "MAX Data Management Team", "shortName": "DMT",
+"desc": "Restart Applications, Create users and manage permissions",
+"remarks": "", "authorizedPrivileges": [4, 5],
+"properties": [1, 3, 7], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 7, "fields": {"title": "Security Administrator", "shortName": "Sec Admin",
+"desc": "Security specialist with elevated privleges",
+"remarks": "", "authorizedPrivileges": [1, 2, 6, 7],
+"properties": [1, 2, 8], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 8, "fields": {"title": "Internal User", "shortName": "Int User",
+"desc": "General user with individual role based access using least privilege, vetted by the organization",
+"remarks": "", "authorizedPrivileges": [],
+"properties": [2, 3, 6], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 9, "fields": {"title": "External User", "shortName": "Ext User",
+"desc": "User who has not been vetted by the organization",
+"remarks": "", "authorizedPrivileges": [],
+"properties": [2, 5, 6], "annotations": [], "links": []}
+},
+{
+"model": "SystemSecurityPlans.roles", "pk": 10,
+"fields": {"title": "All", "shortName": "All", "desc": "Shorthand for a process that is a universal responsibility or applies to all users", "remarks": "",
+"authorizedPrivileges": [], "properties": [], "annotations": [], "links": []}
+}
+]
