@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>Control ID: {{ object.controlID }}</h1>
+<h2>Control Description: {{ object.description }}</h2>
+<h2>Parameters:</h2>
+<ul>
+{% for p in object.parameters.all %}
+    <li>{{ p.paramID }} : {{ p.value }}</li>
+{% endfor %}
+</ul>
+How is the control implemented?
+<ul>
+{% for s in object.statements.all %}
+    <li>{{ s.statementID }} : {{ s.description }}</li>
+{% endfor %}
+</ul>
+</body>
+</html>
