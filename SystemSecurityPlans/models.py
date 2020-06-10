@@ -54,7 +54,7 @@ class properties(models.Model):
     prop_class = models.CharField(max_length=25, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name + ': ' + self.value
 
 
 class links(models.Model):
@@ -126,7 +126,7 @@ class telephoneNumbers(models.Model):
 
 
 class roles(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,unique=True)
     shortName = models.CharField(max_length=25)
     desc = models.CharField(max_length=100)
     authorizedPrivileges = customMany2ManyField(authorizedPrivileges)
@@ -474,7 +474,7 @@ class systemSecurityPlan(models.Model):
     title = models.CharField(max_length=100)
     published = models.DateTimeField()
     lastModified = models.DateTimeField()
-    version = models.CharField(max_length=25)
+    version = models.CharField(max_length=25, default='1.0.0')
     oscalVersion = models.CharField(max_length=10, default='1.0.0')
     # revisionHistory = models.ForeignKey(systemSecurityPlanHistory, on_delete=models.PROTECT)
     documentID = customMany2ManyField(attachments, blank=True)
@@ -485,7 +485,7 @@ class systemSecurityPlan(models.Model):
     parties = customMany2ManyField(parties)
     responsibleParty = customMany2ManyField(roles, related_name='+')
     remarks = customTextField()
-    systemCharacteristics = models.ForeignKey(systemCharacteristics, on_delete=models.PROTECT, null=True)
+    systemCharacteristics = models.ForeignKey(systemCharacteristics, on_delete=models.PROTECT, null=True, )
     # systemImplementations = models.ForeignKey(systemImplementation, on_delete=models.PROTECT, null=True)
     systemComponents = customMany2ManyField(systemComponents)
     controlImplementations = customMany2ManyField(implementedRequirements)

@@ -1,8 +1,5 @@
 from docx import Document
 
-
-# [u'Heading 2', 'GSA Note', 'table of figures', 'Normal', 'GSA Title-YES for TOC', 'GSA List Paragraph', u'Caption', u'Heading 1', 'toc 2', 'toc 1']
-
 def main(document, db, system_id):
     SSP = {}
     SectionTitle = ''

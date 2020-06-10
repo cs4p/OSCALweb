@@ -37,6 +37,7 @@ def cleanData():
     models.properties.objects.all().delete()
     models.systemParameters.objects.all().delete()
     models.statements.objects.all().delete()
+    models.roles.objects.all().delete()
 
 
 def main(document):
@@ -66,19 +67,27 @@ def main(document):
                 for item in roleList:
                     item = item.strip()
                     logging.debug('Adding role ' + item)
-                    newControl.responsibleRoles.get_or_create(title=item[:100], shortName=item[:25], desc=item[:100])
+                    newRole, created = models.roles.objects.get_or_create(title=item[:100], shortName=item[:25], desc=item[:100])
+                    if created: newRole.save()
+                    newControl.responsibleRoles.add(newRole.id)
                 # Find and Add Parameters, Implementation Status, and Control Origination
                 for row in table.rows:
                     content = row.cells[0].text
-                    logging.debug('Adding parameter ' + content)
                     if content[0:9] == "Parameter":
-                        newControl.parameters.create(paramID=content[10:content.find(':')].strip()[:25],
-                                                     value=content[content.find(':') + 1:].strip())
+                        logging.debug('Adding parameter ' + content)
+                        newParameter, created = models.systemParameters.objects.get_or_create(paramID=content[10:content.find(':')].strip()[:25], value=content[content.find(':') + 1:].strip())
+                        if created: newParameter.save()
+                        newControl.parameters.add(newParameter.id)
                     elif content[0:14] == "Implementation":
-                        newControl.properties.create(name='Implementation Status',
-                                                     value=getCheckedOptions(row.cells[0]))
+                        logging.debug('*****DEBUG*****' + content)
+                        content = getCheckedOptions(row.cells[0])
+                        logging.debug('Adding Implementation Status ' + content)
+                        newControl.properties.create(name=newControl.controlID +  'Implementation Status',
+                                                     value=content)
                     elif content[0:7] == "Control":
-                        newControl.properties.create(name='Control Origination', value=getCheckedOptions(row.cells[0]))
+                        content = getCheckedOptions(row.cells[0])
+                        logging.debug('Adding Control Origination ' + content)
+                        newControl.properties.create(name=newControl.controlID + ' Control Origination', value=content)
             else:
                 msg = '|'
                 for item in table.rows[0].cells:
@@ -86,6 +95,7 @@ def main(document):
                 logging.debug('Table not imported. First Row text was ' + msg)
         else:
             rowCount = 0
+            conID = ''
             for row in table.rows:
                 #skip header row
                 if firstRow:
@@ -106,4 +116,9 @@ def main(document):
                     control.statements.create(statementID=controlName, description=controlValue)
                     rowCount = rowCount+1
 
+
+import docx
+from SystemSecurityPlans import models
+import logging
+from OSCALimport.importSecurityControlsFromWord import getCheckedOptions, main, cleanData
 f = 'MAX.gov System Security Plan Controls.docx'
