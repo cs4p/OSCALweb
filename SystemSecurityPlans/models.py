@@ -1,5 +1,15 @@
 from django.db import models
 
+contactInfoType = [('work','Work'),
+                   ('personal','Personal'),
+                   ('shared','Shared'),
+                   ('service','Service'),
+                   ('other','Other')]
+
+attachment_types = [('image', 'Image'),
+                    ('diagram','Diagram'),
+                    ('document','Document'),
+                    ('other', 'Other File Type')]
 
 # Define some common field types
 
@@ -33,23 +43,39 @@ class status(models.Model):
     def __str__(self):
         return self.state
 
-
-class systemFunctions(models.Model):  # list of functions assigned to roles. e.g. backup servers, deploy software, etc.
+class information_type(models.Model):
+    """
+    Management and support information and information systems impact levels
+    as defined in NIST SP 800-60 APPENDIX C. Additional information types may be added
+    by the user
+    """
     title = models.CharField(max_length=100)
     description = customTextField()
+    confidentialityImpact = models.CharField(max_length=50,choices=[(1,"High"),(2,"Moderate"),(3,"Low")])
+    integrityImpact = models.CharField(max_length=50,choices=[(1,"High"),(2,"Moderate"),(3,"Low")])
+    availabilityImpact = models.CharField(max_length=50,choices=[(1,"High"),(2,"Moderate"),(3,"Low")])
 
     def __str__(self):
         return self.title
 
+class hash(models.Model):
+    """
+    used to store hashed values for validation of attachments or linked files
+    """
+    value = customTextField()
+    algorithm = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.algorithm
 
 # These are common attributes of almost all objects
 # Possible these should be polymorphic tables which would reduce
 # complexity but likely have a negative impact on performance.
 
-class properties(models.Model):
+class property(models.Model):
     value = models.CharField(max_length=100, blank=True)
     name = models.CharField(max_length=100)
-    propertyID = models.CharField(max_length=25, blank=True)
+    property_id = models.CharField(max_length=25, blank=True)
     ns = models.CharField(max_length=25, blank=True)
     prop_class = models.CharField(max_length=25, blank=True)
 
@@ -57,17 +83,18 @@ class properties(models.Model):
         return self.name + ': ' + self.value
 
 
-class links(models.Model):
+class link(models.Model):
     text = models.CharField(max_length=100)
     href = models.CharField(max_length=100)
     rel = models.CharField(max_length=100, blank=True)
     mediaType = models.CharField(max_length=100, blank=True)
+    hash = models.ForeignKey(hash, on_delete=models.PROTECT, blank=True)
 
     def __str__(self):
         return self.text
 
 
-class annotations(models.Model):
+class annotation(models.Model):
     name = models.CharField(max_length=100)
     annotationID = models.CharField(max_length=25)
     ns = models.CharField(max_length=100)
@@ -77,46 +104,78 @@ class annotations(models.Model):
     def __str__(self):
         return self.name
 
+# Other common objects used in many places
+class attachment(models.Model):
+    attachment_type = models.CharField(max_length=50, choices=attachment_types)
+    attachment = models.BinaryField()
+    attachment_title = models.CharField(max_length=100)
+    filename = models.CharField(max_length=100, blank=True)
+    mediaType = models.CharField(max_length=100, blank=True)
+    description = customTextField()
+    hash = models.ForeignKey(hash,on_delete=models.PROTECT,blank=True)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
+    caption = models.CharField(max_length=200, blank=True)
+    remarks = customTextField()
 
-# Major elements that make up the SSP
+    def __str__(self):
+        return self.attachment_title
 
-class authorizedPrivileges(models.Model):
+
+# elements of a user, role, and group
+class user_function(models.Model):  # list of functions assigned to roles. e.g. backup servers, deploy software, etc.
     title = models.CharField(max_length=100)
     description = customTextField()
-    functionsPerformed = customMany2ManyField(systemFunctions)
+
+    def __str__(self):
+        return self.title
+
+class user_privilege(models.Model):
+    title = models.CharField(max_length=100)
+    description = customTextField()
+    functionsPerformed = customMany2ManyField(user_function)
 
     def __str__(self):
         return self.title
 
 
-class addrLine(models.Model):
-    value = models.CharField(max_length=100)
+class user_role(models.Model):
+    title = models.CharField(max_length=100,unique=True)
+    shortName = models.CharField(max_length=25)
+    desc = models.CharField(max_length=100)
+    user_privileges = customMany2ManyField(user_privilege)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
+    remarks = customTextField()
 
     def __str__(self):
-        return self.value
+        return self.title
 
-
+# elements that can apply to a user, organization or both
 class address(models.Model):
     title = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
-    postalAddress = customMany2ManyField(addrLine)
+    postal_address = customTextField()
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=2)
-    postalCode = models.CharField(max_length=25)
+    postal_code = models.CharField(max_length=25)
     country = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
 
 
-class emailAddresses(models.Model):
+class email(models.Model):
     email = models.EmailField()
+    type = models.CharField(max_length=50,choices=contactInfoType,default='work')
 
     def __str__(self):
-        return self.email
+        return self.type + ': ' + self.email
 
 
-class telephoneNumbers(models.Model):
+class telephone_number(models.Model):
     number = models.CharField(max_length=25)
     type = models.CharField(max_length=25)
 
@@ -125,198 +184,123 @@ class telephoneNumbers(models.Model):
         return r
 
 
-class roles(models.Model):
-    title = models.CharField(max_length=100,unique=True)
-    shortName = models.CharField(max_length=25)
-    desc = models.CharField(max_length=100)
-    authorizedPrivileges = customMany2ManyField(authorizedPrivileges)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    remarks = customTextField()
-
-    def __str__(self):
-        return self.title
-
-
-class URLs(models.Model):
-    uri = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.uri
-
-
-class locations(models.Model):
+class location(models.Model):
     locationID = models.CharField(verbose_name='location description', max_length=25)
-    addresses = models.ForeignKey(address, on_delete=models.PROTECT)
-    emailAddresses = customMany2ManyField(emailAddresses)
-    telephoneNumbers = customMany2ManyField(telephoneNumbers)
-    URLs = customMany2ManyField(URLs)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
+    address = models.ForeignKey(address, on_delete=models.PROTECT)
+    emailAddresses = customMany2ManyField(email)
+    telephoneNumbers = customMany2ManyField(telephone_number)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
         return self.locationID
 
 
-class orgs(models.Model):  # These are groups of people
-    orgName = models.CharField(max_length=100)
-    shortName = models.CharField(max_length=25)
-    addresses = customMany2ManyField(address)
-    emailAddresses = customMany2ManyField(emailAddresses)
-    telephoneNumbers = customMany2ManyField(telephoneNumbers)
-    URLs = customMany2ManyField(URLs)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
+class organization(models.Model):
+    """
+    Groups of people
+    """
+    organization_name = models.CharField(max_length=100)
+    short_name = models.CharField(max_length=25)
+    locations = customMany2ManyField(location)
+    email_addresses = customMany2ManyField(email)
+    telephone_numbers = customMany2ManyField(telephone_number)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
-        return self.orgName
+        return self.organization_name
 
 
-class persons(models.Model):
-    personName = models.CharField(max_length=100)
-    shortName = models.CharField(max_length=25)
-    orgs = customMany2ManyField(orgs)
-    addresses = customMany2ManyField(address)
-    emailAddresses = customMany2ManyField(emailAddresses)
-    telephoneNumbers = customMany2ManyField(telephoneNumbers)
-    URLs = customMany2ManyField(URLs)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
+class person(models.Model):
+    """
+    An individual who can be assigned roles within a system.
+    """
+    name = models.CharField(max_length=100)
+    short_name = models.CharField(max_length=25)
+    organizations = customMany2ManyField(organization)
+    locations = customMany2ManyField(location)
+    email_addresses = customMany2ManyField(email)
+    telephone_numbers = customMany2ManyField(telephone_number)
+    links = customMany2ManyField(link)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
     remarks = customTextField()
 
     def __str__(self):
         return self.personName
 
-
-class parties(models.Model):  # These can be groups of multiple organizations as well as additional specific people.
-    partyID = models.CharField(verbose_name='Party Description', max_length=100)
-    persons = customMany2ManyField(persons)
-    orgs = customMany2ManyField(orgs)
+class leveraged_authorization(models.Model):
+    leveraged_system_name = models.CharField(max_length=255)
+    link_to_SSP = models.ForeignKey(link,on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.partyID
+        return self.leveraged_system_name
 
 
-class informationTypeImpacts(models.Model):
-    impactType = models.CharField(max_length=25)  # Confidentiality, Integrity or availability
-    properties = customMany2ManyField(properties)
-    base = models.CharField(max_length=25)  # High, Medium, or Low
-    selected = models.CharField(max_length=25)  # High, Medium, or Low
-    adjustmentJustification = customTextField()
+# System Properties
+class system_characteristic(models.Model):
+    """
+    required elements of a System Security Plan
+    """
+    system_name = models.CharField(max_length=100)
+    system_short_name = models.CharField(max_length=25)
+    system_description = customTextField()
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
+    system_status = customMany2ManyField(status)
+    remarks = customTextField()
+    leveraged_authorizations = customMany2ManyField(leveraged_authorization)
+    authorization_boundary_diagram = models.ForeignKey(attachment, on_delete=models.PROTECT, related_name='authorization_boundary_diagram', null=True)
+    network_architecture_diagram = models.ForeignKey(attachment, on_delete=models.PROTECT, related_name='network_architecture_diagram', null=True)
+    data_flow_diagram = models.ForeignKey(attachment, on_delete=models.PROTECT, related_name='data_flow_diagram', null=True)
+
+    def __str__(self):
+        return self.system_name
+
+
+class system_information_type(models.Model):
+    information_type = models.ForeignKey(information_type, on_delete=models.PROTECT)
+    system_information_type_name: models.CharField(max_length=255, blank=True)
+    adjusted_confidentiality_impact = models.CharField(max_length=50,
+                                                       choices=[(1, "High"), (2, "Moderate"), (3, "Low")], blank=True)
+    adjusted_integrity_impact = models.CharField(max_length=50, choices=[(1, "High"), (2, "Moderate"), (3, "Low")],
+                                                 blank=True)
+    adjusted_availability_impact = models.CharField(max_length=50, choices=[(1, "High"), (2, "Moderate"), (3, "Low")],
+                                                    blank=True)
+    adjustment_justification = customTextField()
 
     def __str__(self):
         return self.impactType
 
 
-class informationTypes(models.Model):
-    InfoTypeID = models.CharField(max_length=25)
-    title = models.CharField(max_length=100)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    confidentialityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
-    integrityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
-    availabilityImpact = models.ForeignKey(informationTypeImpacts, related_name='+', on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.title
-
-
-class systemInformationTypes(models.Model):
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    informationTypes = models.ForeignKey(informationTypes, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.informationTypes
-
-
-attachment_types = [('image', 'Image'),
-                    ('diagram','Diagram'),
-                    ('document','Document'),
-                    ('other', 'Other File Type')]
-
-
-class attachments(models.Model):
-    attachment_type = models.CharField(max_length=50, choices=attachment_types)
-    value = models.BinaryField()
-    attachment_title = models.CharField(max_length=100)
-    filename = models.CharField(max_length=100)
-    mediaType = models.CharField(max_length=100)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    caption = models.CharField(max_length=200, blank=True)
+class system_components(models.Model):
+    """
+    A component is a subset of the information system that is either severable or
+    should be described in additional detail. For example, this might be an authentication
+    provider or a backup tool.
+    """
+    component_type = models.CharField(max_length=100)
+    component_title = models.CharField(max_length=100)
+    component_description = models.CharField(max_length=100)
+    component_information_types = customMany2ManyField(system_information_type)
+    component_status = customMany2ManyField(status)
+    component_responsible_roles = customMany2ManyField(user_role)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
-        return self.filename
+        return self.component_title
 
 
-class systemCharacteristics(models.Model):
-    systemName = models.CharField(max_length=100)
-    systemNameShort = models.CharField(max_length=25)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    dateAuthorized = models.DateTimeField()
-    securitySensitivityLevel = models.CharField(max_length=25)
-    status = customMany2ManyField(status)
-    remarks = customTextField()
-    leveragedAuthorizations = models.CharField(max_length=200, blank=True)
-    authorizationBoundary = models.ForeignKey(attachments, on_delete=models.PROTECT, related_name='+',null=True)
-    networkArchitecture = models.ForeignKey(attachments, on_delete=models.PROTECT, related_name='+',null=True)
-    dataFlow = models.ForeignKey(attachments, on_delete=models.PROTECT, related_name='+',null=True)
-
-    def __str__(self):
-        return self.systemName
-
-
-class users(models.Model):
-    title = models.CharField(max_length=100)
-    shortName = models.CharField(max_length=25)
-    description = models.CharField(max_length=100)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    roles = customMany2ManyField(roles)
-
-    def __str__(self):
-        return self.title
-
-
-class systemImplementation(models.Model):
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    user = customMany2ManyField(users)
-    remarks = customTextField()
-
-
-class systemComponents(models.Model):
-    componentType = models.CharField(max_length=100)
-    title = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    status = customMany2ManyField(status)
-    responsibleRoles = customMany2ManyField(roles)
-    remarks = customTextField()
-
-    def __str__(self):
-        return self.title
-
-
-class portRanges(models.Model):
+class port_range(models.Model):
     start = models.IntegerField()
     end = models.IntegerField()
     transport = models.CharField(max_length=40)
@@ -326,170 +310,155 @@ class portRanges(models.Model):
         return r
 
 
-class sspProtocols(models.Model):
-    protocalID = models.CharField(max_length=25)
+class protocol(models.Model):
+    protocal_id = models.CharField(max_length=25)
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
-    portRanges = customMany2ManyField(portRanges)
+    portRanges = customMany2ManyField(port_range)
 
     def __str__(self):
         return self.name
 
 
-class systemServices(models.Model):
-    serviceID = models.CharField(max_length=100)
-    title = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    sspProtocol = customMany2ManyField(sspProtocols)
-    purpose = customTextField()
+class system_service(models.Model):
+    """
+    A service is a capability offered by the information system. Exmaples of services include
+    database access, apis, or authentication. Services are typically accessed by other systems or
+    system components. System services should not to be confused with system functions which
+    are typically accessed by users.
+    """
+    service_id = models.CharField(max_length=100)
+    service_title = models.CharField(max_length=100)
+    service_description = models.CharField(max_length=100)
+    protocols = customMany2ManyField(protocol)
+    service_purpose = customTextField()
+    service_information_types = customMany2ManyField(system_information_type)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
         return self.title
 
 
-class sspInterconnection(models.Model):
-    InterconnectID = models.CharField(max_length=25)
-    remoteSystemName = models.CharField(max_length=100)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    responsibleRoles = customMany2ManyField(roles)
+class system_interconnection(models.Model):
+    system_interconnection_id = models.CharField(max_length=25)
+    remote_system_name = models.CharField(max_length=100)
+    interconnection_responsible_roles = customMany2ManyField(user_role)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
-        return self.remoteSystemName
+        return self.remote_system_name
 
 
-class inventoryComponents(models.Model):
+class inventory_item_type(models.Model):
+    """
+    generic role of an inventory item. For example, webserver, database server, network switch, edge router.
+    All inventory items should be clasified into an inventory item type
+    """
+    inventory_item_type_name = models.CharField(max_length=100)
     use = customTextField()
-    systemComponent = customMany2ManyField(systemComponents)
+    description = customTextField()
+    responsibleRoles = customMany2ManyField(user_role)
+    baseline_configuration = models.ForeignKey(link,on_delete=models.PROTECT,blank=True,related_name='baseline_configuration')
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
 
-class inventoryItems(models.Model):
-    itemID = models.CharField(max_length=100)
-    assetID = models.CharField(max_length=100)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
-    responsibleRoles = customMany2ManyField(roles)
-    inventoryComponents = customMany2ManyField(inventoryComponents)
+class system_inventory_item(models.Model):
+    """
+    Physical (or virtual) items which make up the information system.
+    """
+    item_id = models.CharField(max_length=100)
+    inventory_item_type = models.ForeignKey(inventory_item_type,on_delete=models.PROTECT)
+    item_description = customTextField()
+    item_special_configuration_settings = customTextField()
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
         return self.itemID
 
-
-class systemInventory(models.Model):
-    inventoryItems = customMany2ManyField(inventoryItems)
-    remarks = customTextField()
-
-
-# class implementationComponents(models.Model):
-#     systemComponent = customMany2ManyField(systemComponents)
-#     systemParameters = customMany2ManyField(systemParameters)
-
-
-class statements(models.Model):
-    statementID = models.CharField(max_length=25)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    links = customMany2ManyField(links)
-    responsibleRoles = customMany2ManyField(roles)
+#objects related to security controls
+class control_statement(models.Model):
+    """
+    responses to the requirements defined in each control.  control_statement_id should be
+    in the format {control_id}_{requirement_id}.
+    """
+    control_statement_id = models.CharField(max_length=25)
+    control_statement_responsible_roles = customMany2ManyField(user_role)
+    control_statement_text = customTextField()
+    properties = customMany2ManyField(property)
+    links = customMany2ManyField(link)
+    annotations = customMany2ManyField(annotation)
     remarks = customTextField()
 
     def __str__(self):
-        return self.statementID
+        return self.control_statement_id
 
-class systemParameters(models.Model):
-    paramID = models.CharField(max_length=25)
+class control_parameter(models.Model):
+    control_parameter_id = models.CharField(max_length=25)
     value = customTextField()
 
     def __str__(self):
-        return self.paramID
+        return self.control_parameter_id
 
+control_implementation_status_choices = [
+    ('Implemented','Implemented'),
+    ('Partially implemented ','Partially implemented'),
+    ('Planned ','Planned'),
+    ('Alternative Implementation','Alternative Implementation'),
+    ('Not applicable','Not applicable')]
 
-class implementedRequirements(models.Model):
-    controlID = models.CharField(max_length=25)
-    description = customTextField()
-    responsibleRoles = customMany2ManyField(roles)
-    parameters = customMany2ManyField(systemParameters)
-    statements = customMany2ManyField(statements)
-    properties = customMany2ManyField(properties)
-    annotations = customMany2ManyField(annotations)
-    links = customMany2ManyField(links)
+control_origination_choices = [
+    ('Service Provider Corporate ','Service Provider Corporate'),
+    ('Service Provider System Specific ','Service Provider System Specific'),
+    ('Service Provider Hybrid (Corporate and System Specific)','Service Provider Hybrid'),
+    ('Configured by Customer (Customer System Specific) ','Configured by Customer'),
+    ('Provided by Customer (Customer System Specific) ','Provided by Customer'),
+    ('Shared (Service Provider and Customer Responsibility) ','Shared'),
+    ('Inherited ','Inherited')]
+
+class system_control(models.Model):
+    control_id = models.CharField(max_length=25)
+    control_responsible_roles = customMany2ManyField(user_role)
+    control_parameters = customMany2ManyField(control_parameter)
+    control_statements = customMany2ManyField(control_statement)
+    control_status = models.CharField(max_length=100,choices=control_implementation_status_choices)
+    control_origination = models.CharField(max_length=100,choices=control_origination_choices)
+    properties = customMany2ManyField(property)
+    annotations = customMany2ManyField(annotation)
+    links = customMany2ManyField(link)
     remarks = customTextField()
 
     def __str__(self):
-        return self.controlID
+        return self.control_id
 
 
-class citations(models.Model):
-    text = customTextField()
-    properties = customMany2ManyField(properties)
-    biblio = customTextField()
-
-    def __str__(self):
-        return self.text
-
-
-class hashes(models.Model):
-    value = customTextField()
-    algorithm = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.algorithm
-
-
-class rlinks(models.Model):
-    link = models.ForeignKey(links, on_delete=models.PROTECT)
-    hash = models.ForeignKey(hashes, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.link
-
-
-class resources(models.Model):
-    resourceID = models.CharField(max_length=25)
-    title = models.CharField(max_length=100)
-    description = customTextField()
-    properties = customMany2ManyField(properties)
-    #documents = customMany2ManyField(attachments)
-    citations = customMany2ManyField(citations)
-    rlinks = customMany2ManyField(rlinks)
-    attachments = customMany2ManyField(attachments)
-    remarks = customTextField()
-
-    def __str__(self):
-        return self.title
-
-
-class systemSecurityPlan(models.Model):
+class system_security_plan(models.Model):
     sspID = models.CharField(max_length=25)
     title = models.CharField(max_length=100)
     published = models.DateTimeField()
     lastModified = models.DateTimeField()
     version = models.CharField(max_length=25, default='1.0.0')
     oscalVersion = models.CharField(max_length=10, default='1.0.0')
-    # revisionHistory = models.ForeignKey(systemSecurityPlanHistory, on_delete=models.PROTECT)
-    documentID = customMany2ManyField(attachments, blank=True)
-    properties = customMany2ManyField(properties)
-    links = customMany2ManyField(links)
-    sspRoles = customMany2ManyField(roles)
-    locations = customMany2ManyField(locations)
-    parties = customMany2ManyField(parties)
-    responsibleParty = customMany2ManyField(roles, related_name='+')
+    system_characteristics = models.ForeignKey(system_characteristic, on_delete=models.PROTECT)
+    system_components = customMany2ManyField(system_components)
+    system_services = customMany2ManyField(system_service)
+    system_interconnections = customMany2ManyField(system_interconnection)
+    system_inventory_items = customMany2ManyField(system_inventory_item)
+    controls = customMany2ManyField(system_control)
+    properties = customMany2ManyField(property)
+    links = customMany2ManyField(link)
     remarks = customTextField()
-    systemCharacteristics = models.ForeignKey(systemCharacteristics, on_delete=models.PROTECT, null=True, )
-    # systemImplementations = models.ForeignKey(systemImplementation, on_delete=models.PROTECT, null=True)
-    systemComponents = customMany2ManyField(systemComponents)
-    controlImplementations = customMany2ManyField(implementedRequirements)
-    backMatter = customMany2ManyField(resources)
 
     def __str__(self):
         return self.title

@@ -1,7 +1,7 @@
 [
   {
     "model": "SystemSecurityPlans.status",
-    "pk": 2,
+    "pk": 1,
     "fields": {
       "state": "under-development",
       "description": "The system is being designed, developed, or implemented",
@@ -10,7 +10,7 @@
   },
   {
     "model": "SystemSecurityPlans.status",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "state": "under-major-modification",
       "description": "The system is undergoing a major change or development,",
@@ -19,7 +19,7 @@
   },
   {
     "model": "SystemSecurityPlans.status",
-    "pk": 4,
+    "pk": 3,
     "fields": {
       "state": "disposition",
       "description": "The system is no longer operational.",
@@ -28,7 +28,7 @@
   },
   {
     "model": "SystemSecurityPlans.status",
-    "pk": 5,
+    "pk": 4,
     "fields": {
       "state": "other",
       "description": "Some other state.",

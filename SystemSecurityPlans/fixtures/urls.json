@@ -1,9 +1,0 @@
-[
-  {
-    "model": "SystemSecurityPlans.urls",
-    "pk": 1,
-    "fields": {
-      "uri": "max.gov"
-    }
-  }
-]

@@ -1,6 +1,6 @@
 [
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 1,
     "fields": {
       "title": "Administrator - Server",
@@ -11,7 +11,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 2,
     "fields": {
       "title": "Administrator - Virtual Machine",
@@ -24,7 +24,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 3,
     "fields": {
       "title": "Administrator - Database",
@@ -37,7 +37,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 4,
     "fields": {
       "title": "Debug Application",
@@ -48,7 +48,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 5,
     "fields": {
       "title": "Administrator - Application",
@@ -59,7 +59,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 6,
     "fields": {
       "title": "Manage security systems",
@@ -71,7 +71,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.authorizedprivileges",
+    "model": "SystemSecurityPlans.user_privilege",
     "pk": 7,
     "fields": {
       "title": "Perform security assessments",

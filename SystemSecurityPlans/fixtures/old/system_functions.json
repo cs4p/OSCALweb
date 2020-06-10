@@ -1,6 +1,6 @@
 [
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 1,
     "fields": {
       "title": "Add or remove hardware",
@@ -8,7 +8,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 2,
     "fields": {
       "title": "Install and Configure Software",
@@ -16,7 +16,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 3,
     "fields": {
       "title": "Deploy updates",
@@ -24,7 +24,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 4,
     "fields": {
       "title": "Backups",
@@ -32,7 +32,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 5,
     "fields": {
       "title": "Add or remove database users",
@@ -40,7 +40,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 6,
     "fields": {
       "title": "CRUD operations",
@@ -48,7 +48,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 7,
     "fields": {
       "title": "Database Backups",
@@ -56,7 +56,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 8,
     "fields": {
       "title": "Debug Applications",
@@ -64,7 +64,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 9,
     "fields": {
       "title": "Run commands as service account",
@@ -72,7 +72,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 10,
     "fields": {
       "title": "Manage security applications",
@@ -80,7 +80,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 11,
     "fields": {
       "title": "manage firewall policies",
@@ -88,7 +88,7 @@
     }
   },
   {
-    "model": "SystemSecurityPlans.systemfunctions",
+    "model": "SystemSecurityPlans.user_function",
     "pk": 12,
     "fields": {
       "title": "Security assessments",
