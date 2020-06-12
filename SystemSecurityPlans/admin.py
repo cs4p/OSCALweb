@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.apps import apps
 from SystemSecurityPlans import models
 
-# Register your models here.
-
+# These are some useful functions for cleaning up data after an import
 def changeRoll(old_role,new_role):
     controls = models.system_control.objects.filter(responsibleRoles=models.user_role.objects.filter(title=old_role)[0].pk)
     for item in controls:
@@ -29,11 +28,11 @@ def listRolesWithControlCount():
     for i in sort_roles:
         print(i[0], i[1])
 
-
+# Register your models here.
 
 @admin.register(models.system_security_plan)
 class systemSecurityPlanAdmin(admin.ModelAdmin):
-    #filter_horizontal = ['documentID','properties','links','sspRoles','locations','parties','responsibleParty','systemComponents','controlImplementations','backMatter']
+    filter_horizontal = ['system_components','system_services','system_interconnections','system_inventory_items','controls','properties','links']
 
     def __str__(self):
         return "System Security Plans (SSPs)"
@@ -47,7 +46,15 @@ class system_controlAdmin(admin.ModelAdmin):
 class propertyAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(models.link)
+class linkAdmin(admin.ModelAdmin):
+    list_display = ['text','href','mediaType','requires_authentication']
+    list_editable = ['text','href','mediaType','requires_authentication']
+    list_display_links = None
 
+class system_characteristicAdmin(admin.ModelAdmin):
+    list_display = ['system_name','system_status']
+    filter_horizontal = ['properties','annotations','links']
 
 # all other models
 models = apps.get_models()

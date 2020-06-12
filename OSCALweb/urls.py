@@ -20,4 +20,5 @@ urlpatterns = [
     path('', admin.site.urls, name='index'),
     path('admin/', admin.site.urls, name='admin'),
     path('ssp/', include('SystemSecurityPlans.urls')),
+    path('tinymce/', include('tinymce.urls')),
 ]

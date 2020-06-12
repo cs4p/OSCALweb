@@ -1,0 +1,10 @@
+{% load static %}
+
+<body>
+{% if system_security_plan_list %}
+    {% for plan in system_security_plan_list %}
+        <a href="{% url 'ssp:system_security_planDetailView' plan.id %}">{{ plan.title }}</a><br>
+    {% endfor %}
+{% else %}
+    <p>No controls are available.</p>
+{% endif %}

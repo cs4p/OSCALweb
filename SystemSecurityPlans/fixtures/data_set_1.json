@@ -36,6 +36,15 @@
     }
   },
   {
+    "model": "SystemSecurityPlans.status",
+    "pk": 5,
+    "fields": {
+      "state": "production",
+      "description": "The system is actively in use to support mission functions.",
+      "remarks": ""
+    }
+  },
+  {
     "model": "SystemSecurityPlans.user_function",
     "pk": 1,
     "fields": {

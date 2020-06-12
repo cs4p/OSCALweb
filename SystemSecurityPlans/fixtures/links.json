@@ -1,0 +1,122 @@
+[
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 1,
+    "fields": {
+      "text": "MAX.gov Portal",
+      "href": "https://max.gov",
+      "requires_authentication": false,
+      "rel": "",
+      "mediaType": "",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 2,
+    "fields": {
+      "text": "MAX.gov System Security Information",
+      "href": "https://go.max.gov/security",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 3,
+    "fields": {
+      "text": "MAX.gov ATO Letter",
+      "href": "https://community.max.gov/download/attachments/889685442/ATO_Letter_MAX.gov_OMB_11.1.18.pdf?version=",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "PDF",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 4,
+    "fields": {
+      "text": "MAX.gov FedRAMP Package Access Request Form",
+      "href": "https://marketplace.fedramp.gov/#/product/maxgov-shared-services?sort=productName&productNameSearch=",
+      "requires_authentication": false,
+      "rel": "",
+      "mediaType": "PDF",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 5,
+    "fields": {
+      "text": "MAX.gov User Agreement",
+      "href": "https://community.max.gov/display/Help/MAX+User+Agreement",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 6,
+    "fields": {
+      "text": "MAX Federal Community Content Ownership Policy",
+      "href": "https://community.max.gov/display/Help/MAX+Federal+Community+Content+Ownership+Policy",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 7,
+    "fields": {
+      "text": "MAX Federal Community Accessibility Policy (Section 508) (Help)",
+      "href": "https://community.max.gov/pages/viewpage.action?pageId=132126569",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 8,
+    "fields": {
+      "text": "MAX Federal Community Access Policy",
+      "href": "https://community.max.gov/display/Help/MAX+Federal+Community+Access+Policy",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 9,
+    "fields": {
+      "text": "MAX Sponsor Agreement",
+      "href": "https://community.max.gov/display/Help/MAX+Sponsor+Agreement",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  },
+  {
+    "model": "SystemSecurityPlans.link",
+    "pk": 10,
+    "fields": {
+      "text": "Posting Sensitive Information on MAX",
+      "href": "https://community.max.gov/display/Help/Posting+Sensitive+Information+on+MAX",
+      "requires_authentication": true,
+      "rel": "",
+      "mediaType": "MAX Community Page",
+      "hash": null
+    }
+  }
+]

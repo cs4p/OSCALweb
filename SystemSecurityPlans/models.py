@@ -1,4 +1,5 @@
 from django.db import models
+from tinymce.models import HTMLField
 
 contactInfoType = [('work','Work'),
                    ('personal','Personal'),
@@ -19,15 +20,13 @@ class customMany2ManyField(models.ManyToManyField):
         super().__init__(*args, **kwargs)
 
 
-class customTextField(models.TextField):
+class customTextField(HTMLField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 2000
         kwargs['blank'] = True
         super().__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        del kwargs['max_length']
         del kwargs['blank']
         return name, path, args, kwargs
 
@@ -86,9 +85,10 @@ class property(models.Model):
 class link(models.Model):
     text = models.CharField(max_length=100)
     href = models.CharField(max_length=100)
+    requires_authentication = models.BooleanField(default=False)
     rel = models.CharField(max_length=100, blank=True)
     mediaType = models.CharField(max_length=100, blank=True)
-    hash = models.ForeignKey(hash, on_delete=models.PROTECT, blank=True)
+    hash = models.ForeignKey(hash, on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.text
@@ -107,12 +107,12 @@ class annotation(models.Model):
 # Other common objects used in many places
 class attachment(models.Model):
     attachment_type = models.CharField(max_length=50, choices=attachment_types)
-    attachment = models.BinaryField()
+    attachment = models.FileField()
     attachment_title = models.CharField(max_length=100)
     filename = models.CharField(max_length=100, blank=True)
     mediaType = models.CharField(max_length=100, blank=True)
     description = customTextField()
-    hash = models.ForeignKey(hash,on_delete=models.PROTECT,blank=True)
+    hash = models.ForeignKey(hash,on_delete=models.PROTECT,null=True)
     properties = customMany2ManyField(property)
     annotations = customMany2ManyField(annotation)
     links = customMany2ManyField(link)
@@ -253,7 +253,7 @@ class system_characteristic(models.Model):
     properties = customMany2ManyField(property)
     annotations = customMany2ManyField(annotation)
     links = customMany2ManyField(link)
-    system_status = customMany2ManyField(status)
+    system_status = models.ForeignKey(status, on_delete=models.PROTECT)
     remarks = customTextField()
     leveraged_authorizations = customMany2ManyField(leveraged_authorization)
     authorization_boundary_diagram = models.ForeignKey(attachment, on_delete=models.PROTECT, related_name='authorization_boundary_diagram', null=True)
@@ -279,7 +279,7 @@ class system_information_type(models.Model):
         return self.impactType
 
 
-class system_components(models.Model):
+class system_component(models.Model):
     """
     A component is a subset of the information system that is either severable or
     should be described in additional detail. For example, this might be an authentication
@@ -287,7 +287,7 @@ class system_components(models.Model):
     """
     component_type = models.CharField(max_length=100)
     component_title = models.CharField(max_length=100)
-    component_description = models.CharField(max_length=100)
+    component_description = customTextField()
     component_information_types = customMany2ManyField(system_information_type)
     component_status = customMany2ManyField(status)
     component_responsible_roles = customMany2ManyField(user_role)
@@ -451,7 +451,7 @@ class system_security_plan(models.Model):
     version = models.CharField(max_length=25, default='1.0.0')
     oscalVersion = models.CharField(max_length=10, default='1.0.0')
     system_characteristics = models.ForeignKey(system_characteristic, on_delete=models.PROTECT)
-    system_components = customMany2ManyField(system_components)
+    system_components = customMany2ManyField(system_component)
     system_services = customMany2ManyField(system_service)
     system_interconnections = customMany2ManyField(system_interconnection)
     system_inventory_items = customMany2ManyField(system_inventory_item)

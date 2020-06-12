@@ -1,0 +1,78 @@
+<h1>{{ object.title }}</h1>
+<hr>
+Version: {{ object.version }}    Last Modified: {{ object.lastModified }}
+<p>Table of Contents</p>
+<ol>
+    <li><a href="#system_description">System Description</a></li>
+    <li><a href="#system_diagrams">System Diagrams</a></li>
+    <li><a href="#system_components">System Components</a></li>
+        <ul>
+        {% for component in object.system_components.all %}
+            <li><a href="#system_component:{{ component.component_title }}">{{ component.component_title }} ({{ component.component_type }})</a></li>
+        {% endfor %}
+        </ul>
+    <li><a href="#system_controls">System Controls</a></li>
+</ol>
+<h2>{{ object.system_characteristics.system_name }} ({{ object.system_characteristics.system_short_name}})</h2>
+<p><b>System Status</b>: {{ object.system_characteristics.system_statu }}</p>
+<h3><a id="system_description">System Description</a></h3>
+<p>{{ object.system_characteristics.system_description | safe }}</p>
+<h3><a id="system_diagrams">System Diagrams</a></h3>
+<ul>
+<li><b>Authorization Boundary Diagram: </b><img src="/ssp/assets/{{ object.system_characteristics.authorization_boundary_diagram.attachment }}">
+<li><b>Network Architecture Diagram: </b>{{ object.system_characteristics.network_architecture_diagram.attachment.url }}
+<li><b>Data Flow Diagram: </b>{{ object.system_characteristics.data_flow_diagram.attachment.url }}
+</ul>
+<h3><a id="system_components">System Components</a></h3>
+{% for component in object.system_components.all %}
+<h4><a href="system_component:{{ component.component_title }}">{{ component.component_title }} ({{ component.component_type }})</a></h4>
+{{ component.component_description }}
+{% endfor %}
+<h3><a id="system_controls">System Controls</a></h3>
+{% for control in object.controls.all %}
+        <table style="alignment: center; border-style: solid; width: 90% ">
+        <tr>
+            <td colspan="2"><a href="{% url 'ssp:controlDetailView' control.id %}">{{ control.control_id }}</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">Parameters:</td>
+        </tr>
+        {% for p in control.control_parameters.all %}
+            <tr>
+                <td>{{ p.control_parameter_id }}</td>
+                <td>{{ p.value }}</td>
+            </tr>
+        {% endfor %}
+
+        <tr>
+            <td valign="top">Roles:</td>
+            <td>
+                {% for r in control.control_responsible_roles.all %}
+                    {{ r.title }}<br>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Status:</td>
+            <td> {{ control.control_status }} </td>
+        </tr>
+        <tr>
+            <td>Control_Origination:</td>
+            <td> {{ control.control_origination }} </td>
+        </tr>
+        </table>
+
+        <table style="alignment: center; border-style: solid; width: 90% ">
+            <tr>
+                <td colspan="2"><b>How is the control implemented?</b></td>
+            </tr>
+            {% for s in control.control_statements.all %}
+                <tr>
+                    <td valign="top" width="60">{{ s.control_statement_id }}</td>
+                    <td>{{ s.control_statement_text }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <p></p>
+    {% endfor %}
