@@ -387,7 +387,38 @@ class system_inventory_item(models.Model):
     def __str__(self):
         return self.itemID
 
+
 #objects related to security controls
+
+# Objects to hold control catalog data that should be displayed in the SSP
+
+class nist_control_parameter(models.Model):
+    parameter_id = models.CharField(max_length=25)
+    label = customTextField
+
+    def __str__(self):
+        return self.parameter_id
+
+class nist_control(models.Model):
+    group_id = models.CharField(max_length=2)
+    group_title = models.CharField(max_length=50)
+    control_id = models.CharField(max_length=10)
+    source = models.CharField(max_length=30)
+    control_title = models.CharField(max_length=255)
+    parameters = customMany2ManyField(nist_control_parameter)
+    label = models.CharField(max_length=10,unique=True)
+    sort_id = models.CharField(max_length=10)
+    status = models.CharField(max_length=30,blank=True)
+    links = customMany2ManyField(link)
+    statement = customTextField()
+    guidance = customTextField()
+    objective = customTextField()
+    assessment = customTextField()
+    object = customTextField()
+
+    def __str__(self):
+        return self.control_id
+
 class control_statement(models.Model):
     """
     responses to the requirements defined in each control.  control_statement_id should be
@@ -434,6 +465,7 @@ class system_control(models.Model):
     control_statements = customMany2ManyField(control_statement)
     control_status = models.CharField(max_length=100,choices=control_implementation_status_choices)
     control_origination = models.CharField(max_length=100,choices=control_origination_choices)
+    nist_control = models.ForeignKey(nist_control,to_field='label',on_delete=models.DO_NOTHING,null=True)
     properties = customMany2ManyField(property)
     annotations = customMany2ManyField(annotation)
     links = customMany2ManyField(link)
@@ -462,3 +494,5 @@ class system_security_plan(models.Model):
 
     def __str__(self):
         return self.title
+
+

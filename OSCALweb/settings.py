@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'OSCALweb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db3.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db4.sqlite3'),
     }
 }
 
