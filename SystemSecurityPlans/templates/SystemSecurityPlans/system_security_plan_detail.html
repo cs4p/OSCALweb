@@ -34,44 +34,43 @@
 <h3><a id="system_components">System Components</a></h3>
     {% for component in object.system_components.all %}
         <h4 style="margin-left: 15px"><a id="system_component:{{ component.component_title }}">{{ component.component_title }} ({{ component.component_type }})</a></h4>
-            <div style="margin-left: 30px">{{ component.component_description }}</div>
+            <div style="margin-left: 30px">{{ component.component_description | safe }}</div>
     {% endfor %}
 <h3><a id="system_controls">System Controls</a></h3>
     {% for control in object.controls.all %}
-        <table style="alignment: center; border-style: solid; width: 90% ">
-        <tr>
-            <td colspan="2">
-                <p><a href="/SystemSecurityPlans/system_control/{{ control.id }}/change/">{{ control.control_id }}</a></p>
-                <p>{{ control.nist_control.statement | linebreaks }}</p>
-                <p>Supplimental Guidance:<br>{{ control.nist_control.guidance | linebreaks }}</p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">Parameters:</td>
-        </tr>
-        {% for p in control.control_parameters.all %}
+        <table style="alignment: center; border-style: solid; width: 90%; margin-bottom: 10px ">
             <tr>
-                <td>{{ p.control_parameter_id }}</td>
-                <td>{{ p.value }}</td>
-            </tr>
-        {% endfor %}
-
-        <tr>
-            <td valign="top">Roles:</td>
-            <td>
-                {% for r in control.control_responsible_roles.all %}
-                    {{ r.title }}<br>
-                {% endfor %}
+            <td colspan="2">
+                <p>
+                    <a href="/SystemSecurityPlans/system_control/{{ control.id }}/change/" target="_blank"><b>{{ control.control_id }}&nbsp;
+                    {{ control.nist_control.control_title }}</b></a>
+                    <b>&nbsp;&nbsp;|&nbsp;&nbsp;Status:</b> {{ control.control_status }}<b>&nbsp;&nbsp;|&nbsp;&nbsp;
+                    Control Origination:</b> {{ control.control_origination }}
+                </p>
+                <p><b>Control Statement:</b><br>{{ control.nist_control.statement | linebreaks }}</p>
+                <p><b>Supplimental Guidance:</b><br>{{ control.nist_control.guidance | linebreaks }}</p>
             </td>
-        </tr>
-        <tr>
-            <td>Status:</td>
-            <td> {{ control.control_status }} </td>
-        </tr>
-        <tr>
-            <td>Control_Origination:</td>
-            <td> {{ control.control_origination }} </td>
-        </tr>
+            </tr>
+            <tr><td colspan="2"><table><tr>
+                <td valign="top"><b>Parameters:</b> </td>
+                <td>
+                {% for p in control.control_parameters.all %}
+                    {{ p.control_parameter_id }}: <i>{{ p.value }}</i><br>
+                {% endfor %}
+                </td>
+            </tr></table></td></tr>
+            <tr>
+                <td valign="top" colspan="2">
+                <table><tr>
+                    <td valign="top"><b>Roles:</b> </td>
+                        <td>
+                            {% for r in control.control_responsible_roles.all %}
+                                {{ r.title }}<br>
+                            {% endfor %}
+                        <td>
+                    </td>
+                </tr></table>
+            </tr>
         </table>
 
         <table style="alignment: center; border-style: solid; width: 90% ">
@@ -80,8 +79,8 @@
             </tr>
             {% for s in control.control_statements.all %}
                 <tr>
-                    <td valign="top" width="60">{{ s.control_statement_id }}</td>
-                    <td>{{ s.control_statement_text }}</td>
+                    <td valign="top" width="60"><a href="/SystemSecurityPlans/control_statement/{{ s.id }}/change/" target="_blank">{{ s.control_statement_id }}</a></td>
+                    <td>{{ s.control_statement_text | safe }}</td>
                 </tr>
             {% endfor %}
         </table>

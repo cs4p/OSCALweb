@@ -471,6 +471,15 @@ class system_control(models.Model):
     links = customMany2ManyField(link)
     remarks = customTextField()
 
+    def _get_roles_list(self):
+        # TODO: Figure out why this method always returns empty
+        roleList = []
+        for item in self.control_responsible_roles.values_list('title'):
+            roleList.append(item[0])
+        return roleList
+
+    roles_list = property(_get_roles_list)
+
     def __str__(self):
         return self.control_id
 
