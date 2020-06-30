@@ -22,15 +22,18 @@ def addNewControl(group_id,group_title,control):
         for part in control['parts']:
             if part['name'] == 'statement':
                 control_statement = []
-                if 'prose' in part: control_statement.append(part['prose'] + '\n')
+                if 'prose' in part: control_statement.append('<p>' + part['prose'] + '</p>')
                 if 'parts' in part:
                     for item in part['parts']:
                         proseText = ''
                         if 'prose' in item: proseText = item['prose']
-                        control_statement.append(item['properties'][0]['value'] + ' ' + proseText)
-                    newControl.statement = '/n'.join(control_statement)
+                        control_statement.append('<p>' + item['properties'][0]['value'] + ' ' + proseText + '</p>')
+                    combined_statement = ''.join(control_statement)
+                    newControl.statement = combined_statement.replace('/n','<br>')
             if part['name'] == 'guidance':
-                if 'prose' in part: newControl.guidance = part['prose']
+                if 'prose' in part: newControl.guidance = '<p>' + part['prose'] + '</p>'
+    else:
+        logging.debug(control['id'] + ' has no parts?')
     newControl.save()
     if 'parameters' in control:
         for parameter in control['parameters']:
@@ -56,28 +59,23 @@ def cleanNISTControls():
     with connection.cursor() as cursor:
         cursor.execute(reset_countersSQL)
 
-def linkSystemControltoNISTControl(system_label,nist_label):
-    systemControl = system_control.objects.get(control_id=system_label)
-    nistControl = nist_control.objects.get(label=nist_label)
-    logging.debug("Found possiable match! system_control = " + system_label + " and nist_control = " + nist_label)
-    try:
-        systemControl.nist_control = nistControl
-        systemControl.save()
-        logging.debug("Link Created! system_control = " + system_label + " and nist_control = " + nist_label)
-    except:
-        logging.debug("Match failed :(. system_control = " + system_label + " and nist_control = " + nist_label)
-
-def linkSystemControltoNISTControlErrorHandling(system_label,nist_label):
-    errors = []
-    try:
-        linkSystemControltoNISTControl(system_label,nist_label)
-    except models.ObjectDoesNotExist:
-        nist_label = str(nist_label).replace(' ','')
-        logging.debug("Error occured linking " + system_label + ". Trying again with nist_label = " + nist_label)
-        linkSystemControltoNISTControl(system_label,nist_label)
-    except:
-        errors.append({system_label:sys.exc_info()})
-    return errors
+def linkSystemControltoNISTControl():
+    logging.basicConfig(  # filename=logFile,
+        filemode='w',
+        format='%(name)s - %(levelname)s - %(message)s',
+        level=logging.DEBUG
+    )
+    for item, key in system_control.objects.all().values_list('control_id', 'pk'):
+        control = system_control.objects.get(pk=key)
+        logging.debug('Opened control ' + control.control_id)
+        nist_control_id = item.lower().replace(' ','').replace('(', '.').replace(')', '')
+        logging.debug('Looking up ' + nist_control_id)
+        try:
+            control.nist_control = nist_control.objects.get(control_id=nist_control_id)
+            control.save()
+            logging.debug('Found nist control, link established')
+        except nist_control.DoesNotExist:
+            logging.debug("".join(item[0].lower().split()).replace('(', '.').replace(')', '') + ' not found')
 
 def runLink():
     logging.basicConfig(  # filename=logFile,
@@ -120,3 +118,36 @@ def printKeyError(id,error_type,value,traceback):
     print(id + 'failed import. Missing key:  error: ', error_type, value, traceback, ' skipping..')
 
 # from OSCALimport.importOSCALCatalogJSON import *
+# TODO: Sometimes control statement not imported.  Look at ca-7.1 (OSCALimport/NIST_SP-800-53_rev4_catalog.json:31009)
+
+
+def getControlStatement(control_id):
+    stmnt = ''
+    catalogDict = json.loads(
+        open("/Users/dan/PycharmProjects/OSCALweb/OSCALimport/NIST_SP-800-53_rev4_catalog.json", 'r').read())
+    for group in catalogDict['catalog']['groups']:
+        if group['id'] == control_id[:2]:
+            for control in group['controls']:
+                if control['id'] == control_id[:control_id.find('.')]:
+                    if 'controls' in control:
+                        for control_enhancement in control['controls']:
+                            if control_enhancement['id'] == control_id:
+                                for part in control_enhancement['parts']:
+                                    if part['name'] == 'statement':
+                                        stmnt = part['prose']
+                    else:
+                        for part in control['parts']:
+                            if part['name'] == 'statement':
+                                stmnt = part['prose']
+    return stmnt
+
+
+list(filter( \
+    lambda part : part["name"] == "statement", \
+    list(filter( \
+        lambda control : control['id'] == 'ac-2', \
+        list(filter( \
+            lambda group : group["id"] == 'ac', \
+            catalogDict['catalog']['groups'])) \
+        [0]['controls']))[0]['controls'][0]))[0]['parts'])[0]['prose']
+

@@ -19,9 +19,8 @@ from .views import listControlsView, controlDetailView, system_security_planDeta
 
 app_name = 'ssp'
 urlpatterns = [
-    path('', listControlsView.as_view(), name='index'),
     path('control/', listControlsView.as_view(), name='listControlView'),
     path('control/<int:pk>', controlDetailView.as_view(), name='controlDetailView'),
-    path('list/', list_system_security_planView.as_view(), name='list_system_security_planView'),
+    path('', list_system_security_planView.as_view(), name='list_system_security_planView'),
     path('<int:pk>', system_security_planDetailView.as_view(), name='system_security_planDetailView'),
 ]

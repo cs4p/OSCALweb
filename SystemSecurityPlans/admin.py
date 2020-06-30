@@ -39,12 +39,36 @@ class systemSecurityPlanAdmin(admin.ModelAdmin):
 
 @admin.register(models.system_control)
 class system_controlAdmin(admin.ModelAdmin):
-    #filter_horizontal = ['responsibleRoles','parameters','properties','statements','annotations','links']
-    list_filter = ['control_responsible_roles']
+    filter_horizontal = ['control_responsible_roles','control_parameters','control_statements','properties','annotations','links']
+    list_filter = ['control_responsible_roles','control_origination','nist_control__group_title']
+    list_display = ['nist_control']
+    sortable_by = ['sort_id']
 
-@admin.register(models.property)
-class propertyAdmin(admin.ModelAdmin):
-    pass
+@admin.register(models.control_statement)
+class control_statementAdmin(admin.ModelAdmin):
+    filter_horizontal = ['control_statement_responsible_roles','properties','links','annotations']
+
+@admin.register(models.nist_control)
+class nist_controlAdmin(admin.ModelAdmin):
+    filter_horizontal = ['parameters']
+    list_filter = ['group_title']
+    list_display = ['group_id','group_title','control_id','label']
+    list_display_links = ['group_id','group_title','control_id','label']
+
+@admin.register(models.system_inventory_item)
+class system_inventory_itemAdmin(admin.ModelAdmin):
+    filter_horizontal = ['properties', 'links', 'annotations']
+    list_filter = ['inventory_item_type']
+    list_display = ['item_id', 'inventory_item_type', 'item_description']
+
+@admin.register(models.inventory_item_type)
+class inventory_item_typeAdmin(admin.ModelAdmin):
+    filter_horizontal = ['responsibleRoles','properties', 'links', 'annotations']
+    list_display = ['inventory_item_type_name', 'use', 'description', 'baseline_configuration']
+
+@admin.register(models.system_interconnection)
+class system_interconnectionAdmin(admin.ModelAdmin):
+   filter_horizontal =  ['interconnection_responsible_roles','properties', 'links', 'annotations']
 
 @admin.register(models.link)
 class linkAdmin(admin.ModelAdmin):
@@ -52,9 +76,32 @@ class linkAdmin(admin.ModelAdmin):
     list_editable = ['text','href','mediaType','requires_authentication']
     list_display_links = None
 
+@admin.register(models.system_service)
+class system_serviceAdmin(admin.ModelAdmin):
+    list_display = ['service_title','service_description']
+    filter_horizontal = ['protocols','service_information_types','properties','annotations','links']
+    list_filter = ['protocols']
+
+@admin.register(models.system_component)
+class system_componentAdmin(admin.ModelAdmin):
+    filter_horizontal = ['component_information_types','component_responsible_roles','properties','annotations','links']
+    list_filter = ['component_information_types','component_status','component_responsible_roles','component_type']
+    list_display = ['component_title','component_type', 'component_description']
+
+@admin.register(models.system_characteristic)
 class system_characteristicAdmin(admin.ModelAdmin):
     list_display = ['system_name','system_status']
-    filter_horizontal = ['properties','annotations','links']
+    filter_horizontal = ['properties','annotations','links','leveraged_authorizations']
+
+@admin.register(models.person)
+class personAdmin(admin.ModelAdmin):
+    filter_horizontal = ['organizations','locations','email_addresses','telephone_numbers','properties','annotations','links']
+    list_display = ['name',]
+    list_filter = ['organizations','locations']
+
+@admin.register(models.organization)
+class organizationAdmin(admin.ModelAdmin):
+    filter_horizontal = ['locations', 'email_addresses', 'telephone_numbers', 'properties','annotations', 'links']
 
 # all other models
 models = apps.get_models()

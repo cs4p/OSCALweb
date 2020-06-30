@@ -44,11 +44,11 @@
                 <p>
                     <a href="/SystemSecurityPlans/system_control/{{ control.id }}/change/" target="_blank"><b>{{ control.control_id }}&nbsp;
                     {{ control.nist_control.control_title }}</b></a>
-                    <b>&nbsp;&nbsp;|&nbsp;&nbsp;Status:</b> {{ control.control_status }}<b>&nbsp;&nbsp;|&nbsp;&nbsp;
-                    Control Origination:</b> {{ control.control_origination }}
+                    <b>&nbsp;&nbsp;|&nbsp;&nbsp;Status:</b> {{ control.control_status }}<b>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+                    <b>Control Origination:</b> {{ control.control_origination }}
                 </p>
-                <p><b>Control Statement:</b><br>{{ control.nist_control.statement | linebreaks }}</p>
-                <p><b>Supplimental Guidance:</b><br>{{ control.nist_control.guidance | linebreaks }}</p>
+                <p><b><a href="/SystemSecurityPlans/nist_control/{{ control.nist_control.id }}/change/" target="_blank">Control Statement:</a></b><br>{{ control.nist_control.statement | safe }}</p>
+                <p><b><a href="/SystemSecurityPlans/nist_control/{{ control.nist_control.id }}/change/" target="_blank">Supplemental Guidance:</a></b><br>{{ control.nist_control.guidance | safe }}</p>
             </td>
             </tr>
             <tr><td colspan="2"><table><tr>

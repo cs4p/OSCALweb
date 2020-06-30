@@ -232,7 +232,7 @@ class person(models.Model):
     remarks = customTextField()
 
     def __str__(self):
-        return self.personName
+        return self.name
 
 class leveraged_authorization(models.Model):
     leveraged_system_name = models.CharField(max_length=255)
@@ -289,7 +289,7 @@ class system_component(models.Model):
     component_title = models.CharField(max_length=100)
     component_description = customTextField()
     component_information_types = customMany2ManyField(system_information_type)
-    component_status = customMany2ManyField(status)
+    component_status = models.ForeignKey(status,on_delete=models.PROTECT,null=True)
     component_responsible_roles = customMany2ManyField(user_role)
     properties = customMany2ManyField(property)
     annotations = customMany2ManyField(annotation)
@@ -402,7 +402,7 @@ class nist_control_parameter(models.Model):
 class nist_control(models.Model):
     group_id = models.CharField(max_length=2)
     group_title = models.CharField(max_length=50)
-    control_id = models.CharField(max_length=10)
+    control_id = models.CharField(max_length=7,unique=True)
     source = models.CharField(max_length=30)
     control_title = models.CharField(max_length=255)
     parameters = customMany2ManyField(nist_control_parameter)
@@ -417,7 +417,8 @@ class nist_control(models.Model):
     object = customTextField()
 
     def __str__(self):
-        return self.control_id
+        long_title = self.group_title + ' | ' + self.label + ' | ' + self.control_title
+        return long_title
 
 class control_statement(models.Model):
     """
@@ -433,7 +434,7 @@ class control_statement(models.Model):
     remarks = customTextField()
 
     def __str__(self):
-        return self.control_statement_id
+        return self.control_statement_id + ': ' + self.control_statement_text
 
 class control_parameter(models.Model):
     control_parameter_id = models.CharField(max_length=25)
@@ -465,7 +466,7 @@ class system_control(models.Model):
     control_statements = customMany2ManyField(control_statement)
     control_status = models.CharField(max_length=100,choices=control_implementation_status_choices)
     control_origination = models.CharField(max_length=100,choices=control_origination_choices)
-    nist_control = models.ForeignKey(nist_control,to_field='label',on_delete=models.DO_NOTHING,null=True)
+    nist_control = models.ForeignKey(nist_control,on_delete=models.DO_NOTHING,null=True)
     properties = customMany2ManyField(property)
     annotations = customMany2ManyField(annotation)
     links = customMany2ManyField(link)
