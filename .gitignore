@@ -1,7 +1,7 @@
 # Project exclude paths
 /venv/
 /.idea/.gitignore
-/OSCALimport/migrations/
+/scripts/migrations/
 /importSecurityControlsFromWord.log
 /.idea/misc.xml
 /.idea/modules.xml
@@ -11,7 +11,5 @@
 /.idea/vcs.xml
 /SystemSecurityPlans/assets/
 /SystemSecurityPlans/migrations/
-/db.sqlite3
-/db2.sqlite3
-/db3.sqlite3
 /mydatabase
+/Documents/

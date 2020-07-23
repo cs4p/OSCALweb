@@ -1,54 +1,14 @@
+{% extends "base.html" %}
 {% load static %}
-
-<body>
-{% if system_control %}
-    {% for control in system_control %}
-        <table style="alignment: center; border-style: solid; width: 90% ">
-        <tr>
-            <td colspan="2"><a href="{% url 'ssp:controlDetailView' control.id %}">{{ control.control_id }}</a>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">Parameters:</td>
-        </tr>
-        {% for p in control.control_parameters.all %}
-            <tr>
-                <td>{{ p.control_parameter_id }}</td>
-                <td>{{ p.value }}</td>
-            </tr>
-        {% endfor %}
-
-        <tr>
-            <td valign="top">Roles:</td>
-            <td>
-                {% for r in control.control_responsible_roles.all %}
-                    {{ r.title }}<br>
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <td>Status:</td>
-            <td> {{ control.control_status }} </td>
-        </tr>
-        <tr>
-            <td>Control_Origination:</td>
-            <td> {{ control.control_origination }} </td>
-        </tr>
-        </table>
-
-        <table style="alignment: center; border-style: solid; width: 90% ">
-            <tr>
-                <td colspan="2"><b>How is the control implemented?</b></td>
-            </tr>
-            {% for s in control.control_statements.all %}
-                <tr>
-                    <td valign="top" width="60">{{ s.control_statement_id }}</td>
-                    <td>{{ s.control_statement_text }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        <p></p>
+{% block content %}
+<h1>System Controls</h1>
+{% if system_control_list %}
+    <ul>
+    {% for control in system_control_list %}
+        <li><a href="{% url 'ssp:system_control_detail_view' control.id %}">{{ control.control_id }} {{ control.nist_control.control_title }}</a></li>
     {% endfor %}
+    </ul>
 {% else %}
     <p>No controls are available.</p>
 {% endif %}
+{% endblock %}

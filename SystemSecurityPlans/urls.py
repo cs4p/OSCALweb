@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import listControlsView, controlDetailView, system_security_planDetailView, list_system_security_planView
+from .views import *
 
 app_name = 'ssp'
 urlpatterns = [
-    path('control/', listControlsView.as_view(), name='listControlView'),
-    path('control/<int:pk>', controlDetailView.as_view(), name='controlDetailView'),
-    path('', list_system_security_planView.as_view(), name='list_system_security_planView'),
-    path('<int:pk>', system_security_planDetailView.as_view(), name='system_security_planDetailView'),
+    path('nist_control/list', nist_control_list_view.as_view(), name='nist_control_list_view'),
+    path('nist_control/<int:pk>', nist_control_detail_view.as_view(), name='nist_control_detail_view'),
+    path('control/list', system_control_list_view.as_view(), name='system_control_list_view'),
+    path('control/<int:pk>', system_control_detail_view.as_view(), name='system_control_detail_view'),
+    path('', system_security_plan_list_view.as_view(), name='system_security_plan_list_view'),
+    path('<int:pk>', system_security_plan_detail_view.as_view(), name='system_security_plan_detail_view'),
 ]

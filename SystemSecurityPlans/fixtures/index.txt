@@ -1,5 +1,0 @@
-data_set_1.json: loads default values for status, user_function, user_privilege
-data_set_2.json: user_role, control_statement, control_parameter, system_control
-
-dumpdata SystemSecurityPlans.status, SystemSecurityPlans.user_function, SystemSecurityPlans.user_privilege -o SystemSecurityPlans/fixtures/data_set_1.json
-dumpdata SystemSecurityPlans.user_role SystemSecurityPlans.control_statement SystemSecurityPlans.control_parameter SystemSecurityPlans.property SystemSecurityPlans.system_control -o SystemSecurityPlans/fixtures/data_set_2.json
